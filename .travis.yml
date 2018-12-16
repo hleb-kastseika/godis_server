@@ -1,0 +1,19 @@
+language: go
+go: 1.11.2
+
+services:
+  - docker
+
+branches:
+  only:
+    - master
+
+script:
+  - go test -v && go build
+  - docker build -t godis_server .
+  - docker run --rm -p 9090:9090 godis_server
+
+notifications:
+  email:
+    on_success: never
+    on_failure: always

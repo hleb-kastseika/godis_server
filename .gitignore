@@ -10,3 +10,9 @@
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
+
+# Exclude all GoLand related project files
+.idea/
+*.iml
+*.ipr
+*.iws
