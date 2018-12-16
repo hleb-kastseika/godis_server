@@ -8,7 +8,7 @@ Godis (like Go + Redis) - implementation of simple Redis-like cache for Go langu
 - Golang 1.11.2 or higher
 - Docker (for running in container)
 
-##How to build
+## How to build
 ```
 go build
 ```
