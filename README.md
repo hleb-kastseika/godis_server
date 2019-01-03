@@ -20,8 +20,8 @@ go build
 ```
 
 #### Run options:
-  - -m, -mode - storage mode of the server: "memory" or "disk" (default "memory")
-  - -p, -port - port on which the server runs (default "9090")
+  - -m, -mode -- storage mode of the server: "memory" or "disk" (default "memory")
+  - -p, -port -- port on which the server runs (default "9090")
 <!---  - -v, -verbose - turn on/off full log of client requests, possible values: "true" and "false" (default "false") -->
 Example: ``` ./godis_server -p=8080 -m=disk```
 
