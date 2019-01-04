@@ -7,6 +7,7 @@ import (
 	st "godis_server/storage"
 	"log"
 	"net/http"
+	"strings"
 )
 
 var modeFlag string
@@ -24,9 +25,10 @@ func main() {
 
 func startHTTPServer() {
 	http.HandleFunc("/storage", handleRequest)
+	http.HandleFunc("/storage/keys", handleKeysRequest)
 	err := http.ListenAndServe(":"+portFlag, nil)
 	if err != nil {
-		log.Fatal("Error! Couldn't start server: ", err)
+		log.Fatal("Error! Couldn't start the server: ", err)
 	}
 }
 
@@ -52,10 +54,20 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func handleKeysRequest(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case "GET":
+		doGetKeys(w, r)
+	default:
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		fmt.Fprintf(w, "This method is not allowed")
+	}
+}
+
 func doGet(w http.ResponseWriter, r *http.Request) {
 	keyParams := r.URL.Query()["key"]
 	if len(keyParams) > 1 {
-		http.Error(w, "Please, pass only one key as param or don't pass it at all", http.StatusBadRequest)
+		http.Error(w, "Please, pass only one key as param or don't pass it at all (for getting all data)", http.StatusBadRequest)
 	} else if len(keyParams) == 1 {
 		key := keyParams[0]
 		tuple, ok := storageRep.Get(key)
@@ -89,6 +101,21 @@ func doDelete(w http.ResponseWriter, r *http.Request) {
 	} else {
 		key := keyParams[0]
 		storageRep.Del(key)
+	}
+}
+
+func doGetKeys(w http.ResponseWriter, r *http.Request) {
+	matchParams := r.URL.Query()["match"]
+	if len(matchParams) != 1 || !strings.Contains(matchParams[0], "*") {
+		http.Error(w, "Please, pass only one match param and use '*' for searching keys", http.StatusBadRequest)
+	} else {
+		keys, ok := storageRep.FindKeys(matchParams[0])
+		if ok {
+			jsonKeys, _ := json.Marshal(keys)
+			fmt.Fprintf(w, string(jsonKeys))
+		} else {
+			http.Error(w, "", http.StatusNotFound)
+		}
 	}
 }
 

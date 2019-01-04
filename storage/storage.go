@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"os"
+	"regexp"
+	"strings"
 )
 
 const fileName string = "data.json"
@@ -13,13 +15,16 @@ type Tuple struct {
 	Value string `json:"value"`
 }
 
+//Common Storage interface
 type Storage interface {
 	Set(tuple Tuple) Tuple
 	Get(key string) (Tuple, bool)
 	GetAll() []Tuple
 	Del(key string)
+	FindKeys(keyPattern string) ([]string, bool)
 }
 
+//InmemoryStorage - Storage interface implementation which works with inmemory map
 type InmemoryStorage struct {
 	storage map[string]string
 }
@@ -34,26 +39,22 @@ func (is InmemoryStorage) Set(tuple Tuple) Tuple {
 }
 
 func (is InmemoryStorage) Get(key string) (Tuple, bool) {
-	value, ok := is.storage[key]
-	if ok {
-		return Tuple{key, value}, true
-	} else {
-		return Tuple{}, false //TODO fix it!!!
-	}
+	return get(is.storage, key)
 }
 
 func (is InmemoryStorage) GetAll() []Tuple {
-	tuples := make([]Tuple, len(is.storage))
-	for key, value := range is.storage {
-		tuples = append(tuples, Tuple{key, value})
-	}
-	return tuples
+	return getAll(is.storage)
 }
 
 func (is InmemoryStorage) Del(key string) {
 	delete(is.storage, key)
 }
 
+func (is InmemoryStorage) FindKeys(keyPattern string) ([]string, bool) {
+	return findKeys(keyPattern, is.storage)
+}
+
+//DiskStorage - Storage interface implementation which works with map stored in file on the disk
 type DiskStorage struct {
 }
 
@@ -75,6 +76,26 @@ func (ds DiskStorage) Set(tuple Tuple) Tuple {
 
 func (ds DiskStorage) Get(key string) (Tuple, bool) {
 	m := readMapFromFile()
+	return get(m, key)
+}
+
+func (ds DiskStorage) GetAll() []Tuple {
+	m := readMapFromFile()
+	return getAll(m)
+}
+
+func (ds DiskStorage) Del(key string) {
+	m := readMapFromFile()
+	delete(m, key)
+	writeMapToFile(m)
+}
+
+func (ds DiskStorage) FindKeys(keyPattern string) ([]string, bool) {
+	m := readMapFromFile()
+	return findKeys(keyPattern, m)
+}
+
+func get(m map[string]string, key string) (Tuple, bool) {
 	value, ok := m[key]
 	if ok {
 		return Tuple{key, value}, true
@@ -83,8 +104,7 @@ func (ds DiskStorage) Get(key string) (Tuple, bool) {
 	}
 }
 
-func (ds DiskStorage) GetAll() []Tuple {
-	m := readMapFromFile()
+func getAll(m map[string]string) []Tuple {
 	tuples := make([]Tuple, len(m))
 	for key, value := range m {
 		tuples = append(tuples, Tuple{key, value})
@@ -92,10 +112,16 @@ func (ds DiskStorage) GetAll() []Tuple {
 	return tuples
 }
 
-func (ds DiskStorage) Del(key string) {
-	m := readMapFromFile()
-	delete(m, key)
-	writeMapToFile(m)
+func findKeys(keyPattern string, m map[string]string) ([]string, bool) {
+	keys := make([]string, len(m))
+	keyPattern = strings.Replace(keyPattern, "*", "(.*)", -1)
+	for key := range m {
+		match, _ := regexp.MatchString(keyPattern, key)
+		if match {
+			keys = append(keys, key)
+		}
+	}
+	return keys, len(keys) > 0
 }
 
 func writeMapToFile(m map[string]string) {

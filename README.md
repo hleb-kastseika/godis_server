@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/gleb-kosteiko/godis_server.svg?branch=master)](https://travis-ci.org/gleb-kosteiko/godis)
+[![Build Status](https://travis-ci.org/gleb-kosteiko/godis_server.svg?branch=master)](https://travis-ci.org/gleb-kosteiko/godis_server)
 
 # Godis Server
 
@@ -10,7 +10,7 @@ Godis (like Go + Redis) - implementation of simple Redis-like cache for Go langu
 
 ## How to build
 ```
-go build
+go clean && go test ./... -coverprofile coverage.out && go build
 ```
 
 ## How to run
