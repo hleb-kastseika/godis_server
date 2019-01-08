@@ -9,7 +9,7 @@ branches:
     - master
 
 script:
-  - go test -v && go build
+  - go clean && go test ./... -coverprofile coverage.out && go build
   - docker build -t godis_server .
   - docker run --rm -p 9090:9090 godis_server
 
