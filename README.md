@@ -1,5 +1,3 @@
-[![Build Status](https://travis-ci.org/gleb-kosteiko/godis_server.svg?branch=master)](https://travis-ci.org/gleb-kosteiko/godis_server)
-
 # Godis Server
 
 Godis (like Go + Redis) - implementation of simple Redis-like cache for Go language training. This is the server side of Godis.
