@@ -8,6 +8,9 @@ branches:
   only:
     - master
 
+before_script:
+  - export GOROOT=${TRAVIS_HOME}/gopath/src/github.com/gleb-kosteiko/godis_server
+  
 script:
   - go clean && go test ./... -coverprofile coverage.out && go build
   - docker build -t godis_server .
