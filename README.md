@@ -29,4 +29,58 @@ docker build -t godis_server .
 docker run --rm -p 9090:9090 godis_server
 ```
 
-For access the server via HTTP use any HTTP client, the main resource - http://localhost:9090/storage
+#### REST API documentation
+For access the server via HTTP use any HTTP client, There is the list of avalaible resources and methods:
+
+---
+##### Get value by key
+`GET`  http://localhost:9090/storage?key=key_value
+
+_Headers_: 'Content-Type:application/json'
+
+_URL Params_: key (string, required)
+
+_Success Response_: Code - 200 Ok, Content - {"key":"test","value":"test value"}
+
+_Error Response_: Code - 404 Not Fount
+
+---
+##### Get all values
+`GET`  http://localhost:9090/storage
+
+_Headers_: 'Content-Type:application/json'
+
+_Success Response_: Code - 200 Ok, Content - [{"key":"","value":""},{"key":"","value":""},{"key":"test","value":"test value"},{"key":"test2","value":"test value 2"}]
+
+---
+##### Set value
+`POST`  http://localhost:9090/storage
+
+_Headers_: 'Content-Type:application/json'
+
+_Body_: '{"key":"test","value":"test value"}'
+
+_Success Response_: Code - 200 Ok, Content - {"key":"test","value":"test value"}
+
+_Error Response_: Code - 400 Bad Request, Content - 'Pass the data in next format: {"key":"","value":""}'
+
+---
+##### Delete value
+`DELETE` http://localhost:9090/storage?key=key_value
+
+_Headers_: 'Content-Type:application/json'
+
+_URL Params_: key (string, required)
+
+_Success Response_: Code - 200 Ok
+
+---
+##### Find keys that matches to expression
+
+`GET` http://localhost:9090/storage/keys?match=value*
+
+_Headers_: 'Content-Type:application/json'
+
+_URL Params_: match (string, required, should contain '*')
+
+_Success Response_: Code - 200 Ok, Content - ["test1","test2","test3"]
