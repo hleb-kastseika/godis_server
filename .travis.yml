@@ -9,7 +9,9 @@ branches:
     - master
 
 before_script:
-  - export GOROOT=${TRAVIS_HOME}/gopath/src/github.com/gleb-kosteiko/godis_server
+  - export GOROOT=/usr/local/go
+  - export GOPATH=${TRAVIS_HOME}/go
+  - export PATH=$PATH:$GOROOT/bin
   
 script:
   - go clean && go test ./... -coverprofile coverage.out && go build
